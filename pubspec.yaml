@@ -2,7 +2,7 @@ name: konfide
 description: "A conversation starter app"
 publish_to: 'none' 
 
-version: 1.0.0+1
+version: 2.0.0+2
 
 environment:
   sdk: ^3.5.0
@@ -12,11 +12,23 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.8
   carousel_slider_plus: ^7.0.0
+  google_fonts: ^6.2.1
+  flutter_animate: ^4.5.2
+  shared_preferences: ^2.5.5
+  share_plus: ^13.3.1
+  path_provider: ^2.1.6
+  uuid: ^4.6.0
+  sqflite: ^2.4.4
+  path: ^1.9.1
+  sqflite_common_ffi: ^2.4.3
+  sqflite_common: ^2.5.13
+  file_picker: ^13.1.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^4.0.0
-
 flutter:
   uses-material-design: true
+  assets:
+    - assets/decks/
