@@ -235,7 +235,6 @@ class StorageService extends ChangeNotifier {
     final duplicated = QuestionDeck(
       id: newDeckId,
       title: titleOverride ?? '${originalDeck.title} (Copy)',
-      subtitle: originalDeck.subtitle,
       description: originalDeck.description,
       icon: originalDeck.icon,
       accentColor: originalDeck.accentColor,

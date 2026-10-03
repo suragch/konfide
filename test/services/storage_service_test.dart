@@ -118,7 +118,6 @@ void main() {
       const deck = QuestionDeck(
         id: 'deck_custom_1',
         title: 'Roadtrip Questions',
-        subtitle: 'Car games',
         description: 'Questions to ask on long drives',
         icon: Icons.explore_outlined,
         accentColor: Color(0xFFD97736),
@@ -187,7 +186,6 @@ void main() {
       const externalPack = QuestionDeck(
         id: 'deck_external',
         title: 'Deep Intimacy',
-        subtitle: 'Couples',
         description: 'Brought from friend',
         icon: Icons.favorite,
         accentColor: Color(0xFFE11D48),

@@ -29,7 +29,6 @@ class PresetDeckService {
 
     final id = decoded['id'] as String? ?? defaultId ?? 'preset_${DateTime.now().millisecondsSinceEpoch}';
     final title = (decoded['title'] as String?)?.trim() ?? 'Curated Deck';
-    final subtitle = (decoded['subtitle'] as String?)?.trim() ?? '';
     final description = (decoded['description'] as String?)?.trim() ?? '';
     final iconKey = decoded['icon'] as String? ?? decoded['iconKey'] as String? ?? 'chat';
     final version = (decoded['version'] as num?)?.toInt() ?? 1;
@@ -76,7 +75,6 @@ class PresetDeckService {
     return QuestionDeck(
       id: id,
       title: title,
-      subtitle: subtitle,
       description: description,
       icon: QuestionDeck.iconFromKey(iconKey),
       accentColor: accentColor,

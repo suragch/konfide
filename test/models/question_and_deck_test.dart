@@ -30,7 +30,6 @@ void main() {
       const deck = QuestionDeck(
         id: 'test_deck',
         title: 'Test Deck',
-        subtitle: 'Subtitle',
         description: 'Description',
         icon: Icons.chat_bubble_outline,
         accentColor: Colors.brown,

@@ -66,7 +66,6 @@ Paste the following template and fill in your content:
   "id": "career_and_dreams",
   "version": 1,
   "title": "Career & Aspirations",
-  "subtitle": "Ambition & Life Work",
   "description": "Meaningful questions about vocation, proud accomplishments, creative callings, and future dreams.",
   "icon": "lightbulb",
   "accentColor": "#0EA5E9",
@@ -111,7 +110,6 @@ When users update or launch the app, Konfide automatically detects the new deck 
 | `id`          | `String` |   Yes    | Unique identifier (lowercase, underscores).       | `"couples_romance"`      |
 | `version`     |  `int`   |   Yes    | Monotonically increasing version counter.         | `1`, `2`, `3`            |
 | `title`       | `String` |   Yes    | Display name of the pack.                         | `"Two Hearts & Romance"` |
-| `subtitle`    | `String` |   Yes    | Short thematic tagline shown under the title.     | `"Couples & Closeness"`  |
 | `description` | `String` |   Yes    | 1-2 sentence description of the pack's focus.     | `"Romantic intimacy..."` |
 | `icon`        | `String` |   Yes    | Icon key mapped to a Material icon (see below).   | `"heart"`                |
 | `accentColor` | `String` |   Yes    | 6-digit hex color code starting with `#`.         | `"#E11D48"`              |
@@ -171,7 +169,7 @@ When an existing user updates their app through an app store release, their loca
 
 2. **Smart Question Upsert on Version Bump**:
    - If `asset.version > db.version`:
-     - Updates the deck title, subtitle, description, icon, and accent color.
+     - Updates the deck title, description, icon, and accent color.
      - For existing questions (matching ID): Updates the text in place. **Favorites and personal reflection notes remain linked to that question ID.**
      - For new questions: Appends them to the deck.
      - For retired questions: Safely deletes them from the database.
@@ -192,7 +190,7 @@ You can also draft and test question packs right inside the Konfide app before a
 
 1. Launch Konfide on your phone or computer.
 2. Tap the **+** (New Pack) button under **Your Custom Packs**.
-3. Fill in the title, subtitle, description, choose a color, and type in your questions.
+3. Fill in the title, description, choose a color, and type in your questions.
 4. Tap the three dots (`⋮`) on your custom pack and choose **Export Pack (.json)**.
 5. Save the file or copy the JSON to your clipboard.
 6. Paste the exported `.json` file into `assets/decks/<pack_id>.json`.

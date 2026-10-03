@@ -21,7 +21,6 @@ class DeckExchangeService {
       'format': formatIdentifier,
       'version': currentVersion,
       'title': deck.title,
-      'subtitle': deck.subtitle,
       'description': deck.description,
       'icon': deck.iconKey,
       'accentColor': hexColor,
@@ -92,7 +91,6 @@ class DeckExchangeService {
       throw const FormatException('Pack contains no valid questions.');
     }
 
-    final subtitle = (decoded['subtitle'] as String?)?.trim() ?? 'Custom Pack';
     final description = (decoded['description'] as String?)?.trim() ??
         'Imported pack with ${questions.length} questions.';
     final iconKey = (decoded['icon'] as String?)?.trim() ?? 'chat';
@@ -116,7 +114,6 @@ class DeckExchangeService {
     return QuestionDeck(
       id: deckId,
       title: title,
-      subtitle: subtitle,
       description: description,
       icon: icon,
       accentColor: accentColor,

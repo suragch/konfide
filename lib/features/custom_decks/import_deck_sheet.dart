@@ -340,14 +340,6 @@ class _ImportDeckSheetState extends State<ImportDeckSheet> {
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
-                                Text(
-                                  _parsedDeck!.subtitle,
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                    color: _parsedDeck!.accentColor,
-                                  ),
-                                ),
                               ],
                             ),
                           ),

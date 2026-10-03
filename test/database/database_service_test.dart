@@ -84,7 +84,6 @@ void main() {
       const customDeck = QuestionDeck(
         id: 'deck_travel',
         title: 'Travel Tales',
-        subtitle: 'Adventures',
         description: 'Stories from the road',
         icon: Icons.explore_outlined,
         accentColor: Color(0xFF10B981),
@@ -157,7 +156,6 @@ void main() {
       const newPack = QuestionDeck(
         id: 'brand_new_pack',
         title: 'Brand New Pack',
-        subtitle: 'New Subtitle',
         description: 'New Description',
         icon: Icons.star,
         accentColor: Colors.amber,
@@ -184,7 +182,6 @@ void main() {
       const initialDeck = QuestionDeck(
         id: 'versioned_deck',
         title: 'Version 1 Title',
-        subtitle: 'Sub 1',
         description: 'Desc 1',
         icon: Icons.chat,
         accentColor: Colors.blue,
@@ -212,7 +209,6 @@ void main() {
       const updatedDeck = QuestionDeck(
         id: 'versioned_deck',
         title: 'Version 2 Title',
-        subtitle: 'Sub 2 Updated',
         description: 'Desc 2 Updated',
         icon: Icons.chat,
         accentColor: Colors.purple,

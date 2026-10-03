@@ -10,7 +10,6 @@ void main() {
       const deck = QuestionDeck(
         id: 'deck_sample',
         title: 'Campfire Stories',
-        subtitle: 'Night vibes',
         description: 'Deep questions around the fire.',
         icon: Icons.local_fire_department,
         accentColor: Color(0xFFC2410C),
@@ -33,7 +32,6 @@ void main() {
         "format": "konfide_deck",
         "version": 1,
         "title": "Roadtrip Confessions",
-        "subtitle": "Highway & Backroads",
         "description": "Fun questions for long drives.",
         "icon": "explore",
         "accentColor": "#10B981",
@@ -46,7 +44,6 @@ void main() {
 
       final deck = DeckExchangeService.parseAndValidateDeckJson(validJson);
       expect(deck.title, 'Roadtrip Confessions');
-      expect(deck.subtitle, 'Highway & Backroads');
       expect(deck.description, 'Fun questions for long drives.');
       expect(deck.icon, Icons.explore_outlined);
       expect(deck.accentColor, const Color(0xFF10B981));
@@ -112,7 +109,6 @@ void main() {
       const original = QuestionDeck(
         id: 'deck_orig',
         title: 'Deep Soul',
-        subtitle: 'Intimacy',
         description: 'Vulnerable thoughts.',
         icon: Icons.favorite_outline,
         accentColor: Color(0xFFE11D48),
@@ -126,7 +122,6 @@ void main() {
       final imported = DeckExchangeService.parseAndValidateDeckJson(json);
 
       expect(imported.title, original.title);
-      expect(imported.subtitle, original.subtitle);
       expect(imported.description, original.description);
       expect(imported.questions.length, original.questions.length);
       expect(imported.questions[0].text, original.questions[0].text);

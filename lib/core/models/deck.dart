@@ -4,7 +4,6 @@ import 'package:konfide/core/models/question.dart';
 class QuestionDeck {
   final String id;
   final String title;
-  final String subtitle;
   final String description;
   final IconData icon;
   final Color accentColor;
@@ -15,7 +14,6 @@ class QuestionDeck {
   const QuestionDeck({
     required this.id,
     required this.title,
-    required this.subtitle,
     required this.description,
     required this.icon,
     required this.accentColor,
@@ -34,7 +32,6 @@ class QuestionDeck {
   QuestionDeck copyWith({
     String? id,
     String? title,
-    String? subtitle,
     String? description,
     IconData? icon,
     Color? accentColor,
@@ -45,7 +42,6 @@ class QuestionDeck {
     return QuestionDeck(
       id: id ?? this.id,
       title: title ?? this.title,
-      subtitle: subtitle ?? this.subtitle,
       description: description ?? this.description,
       icon: icon ?? this.icon,
       accentColor: accentColor ?? this.accentColor,
@@ -98,7 +94,6 @@ class QuestionDeck {
     return {
       'id': id,
       'title': title,
-      'subtitle': subtitle,
       'description': description,
       'iconKey': iconKey,
       'accentColorValue': accentColor.toARGB32(),
@@ -121,7 +116,6 @@ class QuestionDeck {
     return QuestionDeck(
       id: json['id'] as String? ?? '',
       title: json['title'] as String? ?? 'Custom Deck',
-      subtitle: json['subtitle'] as String? ?? '',
       description: json['description'] as String? ?? '',
       icon: iconFromKey(iconKey),
       accentColor: Color(colorValue),

@@ -530,15 +530,6 @@ class _TopicScreenState extends State<TopicScreen> {
                                     ),
                                   ],
                                 ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  deck.subtitle,
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                    color: deck.accentColor,
-                                  ),
-                                ),
                                 const SizedBox(height: 6),
                                 Text(
                                   deck.description,
@@ -854,15 +845,6 @@ class _TopicScreenState extends State<TopicScreen> {
                                         ],
                                       ),
                                     ],
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    deck.subtitle,
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600,
-                                      color: deck.accentColor,
-                                    ),
                                   ),
                                   const SizedBox(height: 6),
                                   Text(

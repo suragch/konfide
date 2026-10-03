@@ -12,7 +12,6 @@ void main() {
         "id": "sample_preset",
         "version": 2,
         "title": "Sample Title",
-        "subtitle": "Sample Subtitle",
         "description": "Sample Description",
         "icon": "sparkles",
         "accentColor": "#FF5722",
@@ -28,7 +27,6 @@ void main() {
       expect(deck.id, 'sample_preset');
       expect(deck.version, 2);
       expect(deck.title, 'Sample Title');
-      expect(deck.subtitle, 'Sample Subtitle');
       expect(deck.description, 'Sample Description');
       expect(deck.icon, Icons.auto_awesome);
       expect(deck.accentColor, const Color(0xFFFF5722));

@@ -19,7 +19,6 @@ void main() {
     testDeck = const QuestionDeck(
       id: 'test_deck_1',
       title: 'Deep Connections',
-      subtitle: 'Meaningful conversations',
       description: 'Deck for deep talks',
       icon: Icons.favorite_outline,
       accentColor: Color(0xFFD97736),

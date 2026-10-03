@@ -42,7 +42,6 @@ void main() {
       "format": "konfide_deck",
       "version": 1,
       "title": "Weekend Escapes",
-      "subtitle": "Getaway Talk",
       "description": "Fun weekend conversation.",
       "icon": "explore",
       "accentColor": "#10B981",
@@ -59,7 +58,6 @@ void main() {
     // Verify preview card appears
     expect(find.text('Pack Preview'), findsOneWidget);
     expect(find.text('Weekend Escapes'), findsOneWidget);
-    expect(find.text('Getaway Talk'), findsOneWidget);
     expect(find.text('2 questions included'), findsOneWidget);
 
     // Tap the import button

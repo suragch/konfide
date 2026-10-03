@@ -18,7 +18,6 @@ class CustomDeckScreen extends StatefulWidget {
 class _CustomDeckScreenState extends State<CustomDeckScreen> {
   final StorageService _storage = StorageService.instance;
   late TextEditingController _titleController;
-  late TextEditingController _subtitleController;
   late TextEditingController _descriptionController;
   late List<Question> _questions;
 
@@ -27,7 +26,6 @@ class _CustomDeckScreenState extends State<CustomDeckScreen> {
     super.initState();
     final deck = widget.initialDeck;
     _titleController = TextEditingController(text: deck?.title ?? '');
-    _subtitleController = TextEditingController(text: deck?.subtitle ?? '');
     _descriptionController =
         TextEditingController(text: deck?.description ?? '');
     _questions = deck != null ? List.from(deck.questions) : [];
@@ -36,7 +34,6 @@ class _CustomDeckScreenState extends State<CustomDeckScreen> {
   @override
   void dispose() {
     _titleController.dispose();
-    _subtitleController.dispose();
     _descriptionController.dispose();
     super.dispose();
   }
@@ -122,9 +119,6 @@ class _CustomDeckScreenState extends State<CustomDeckScreen> {
     final deck = QuestionDeck(
       id: deckId,
       title: title,
-      subtitle: _subtitleController.text.trim().isNotEmpty
-          ? _subtitleController.text.trim()
-          : 'Custom Pack',
       description: _descriptionController.text.trim().isNotEmpty
           ? _descriptionController.text.trim()
           : 'Personal questions created by you.',
@@ -171,17 +165,6 @@ class _CustomDeckScreenState extends State<CustomDeckScreen> {
             decoration: InputDecoration(
               labelText: 'Pack Title',
               hintText: 'e.g., Road Trip with Sarah',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-            ),
-          ),
-          const SizedBox(height: 14),
-          TextField(
-            controller: _subtitleController,
-            decoration: InputDecoration(
-              labelText: 'Subtitle',
-              hintText: 'e.g., Special Occasions',
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
               ),

@@ -90,7 +90,6 @@ class DatabaseService {
       CREATE TABLE decks (
         id TEXT PRIMARY KEY,
         title TEXT NOT NULL,
-        subtitle TEXT NOT NULL,
         description TEXT NOT NULL,
         icon_key TEXT NOT NULL,
         accent_color_value INTEGER NOT NULL,
@@ -181,7 +180,6 @@ class DatabaseService {
       {
         'id': deck.id,
         'title': deck.title,
-        'subtitle': deck.subtitle,
         'description': deck.description,
         'icon_key': deck.iconKey,
         'accent_color_value': deck.accentColor.toARGB32(),
@@ -348,7 +346,6 @@ class DatabaseService {
       return QuestionDeck(
         id: deckId,
         title: row['title'] as String,
-        subtitle: row['subtitle'] as String,
         description: row['description'] as String,
         icon: QuestionDeck.iconFromKey(row['icon_key'] as String),
         accentColor: Color(row['accent_color_value'] as int),
@@ -387,7 +384,6 @@ class DatabaseService {
     return QuestionDeck(
       id: id,
       title: row['title'] as String,
-      subtitle: row['subtitle'] as String,
       description: row['description'] as String,
       icon: QuestionDeck.iconFromKey(row['icon_key'] as String),
       accentColor: Color(row['accent_color_value'] as int),
@@ -450,7 +446,6 @@ class DatabaseService {
       'decks',
       {
         'title': assetDeck.title,
-        'subtitle': assetDeck.subtitle,
         'description': assetDeck.description,
         'icon_key': assetDeck.iconKey,
         'accent_color_value': assetDeck.accentColor.toARGB32(),
