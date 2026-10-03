@@ -165,60 +165,96 @@ class _TopicScreenState extends State<TopicScreen> {
           ),
         ),
         actions: [
-          // Favorites Button
-          IconButton(
-            tooltip: 'Saved Questions',
-            icon: Badge(
-              isLabelVisible: favoritesCount > 0,
-              label: Text('$favoritesCount'),
-              backgroundColor: const Color(0xFFEAB308),
-              textColor: Colors.black,
-              child: const Icon(Icons.star_outline_rounded, size: 24),
-            ),
-            onPressed: () {
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert_rounded),
+            tooltip: 'Menu',
+            onSelected: (value) {
               HapticService.light();
-              Navigator.of(context).push(
-                MaterialPageRoute<void>(builder: (_) => const FavoritesScreen()),
-              );
+              switch (value) {
+                case 'favorites':
+                  Navigator.of(context).push(
+                    MaterialPageRoute<void>(builder: (_) => const FavoritesScreen()),
+                  );
+                  break;
+                case 'import':
+                  ImportDeckSheet.show(context);
+                  break;
+                case 'create':
+                  Navigator.of(context).push(
+                    MaterialPageRoute<void>(builder: (_) => const CustomDeckScreen()),
+                  );
+                  break;
+                case 'settings':
+                  Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => SettingsScreen(
+                        onThemeChanged: widget.onThemeChanged,
+                      ),
+                    ),
+                  );
+                  break;
+              }
             },
-          ),
-
-          // Import Pack Button
-          IconButton(
-            tooltip: 'Import Pack',
-            icon: const Icon(Icons.file_download_outlined, size: 24),
-            onPressed: () {
-              HapticService.light();
-              ImportDeckSheet.show(context);
-            },
-          ),
-
-          // Custom Deck Button
-          IconButton(
-            tooltip: 'Create Pack',
-            icon: const Icon(Icons.add_circle_outline_rounded, size: 24),
-            onPressed: () {
-              HapticService.light();
-              Navigator.of(context).push(
-                MaterialPageRoute<void>(builder: (_) => const CustomDeckScreen()),
-              );
-            },
-          ),
-
-          // Settings Button
-          IconButton(
-            tooltip: 'Settings',
-            icon: const Icon(Icons.tune_rounded, size: 22),
-            onPressed: () {
-              HapticService.light();
-              Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (_) => SettingsScreen(
-                    onThemeChanged: widget.onThemeChanged,
-                  ),
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: 'favorites',
+                child: Row(
+                  children: [
+                    const Icon(Icons.star_outline_rounded, size: 20),
+                    const SizedBox(width: 12),
+                    const Expanded(child: Text('Saved Questions')),
+                    if (favoritesCount > 0)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFEAB308),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          '$favoritesCount',
+                          style: const TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
-              );
-            },
+              ),
+              const PopupMenuItem(
+                value: 'create',
+                child: Row(
+                  children: [
+                    Icon(Icons.add_circle_outline_rounded, size: 20),
+                    SizedBox(width: 12),
+                    Text('Create Pack'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'import',
+                child: Row(
+                  children: [
+                    Icon(Icons.file_download_outlined, size: 20),
+                    SizedBox(width: 12),
+                    Text('Import Pack'),
+                  ],
+                ),
+              ),
+              const PopupMenuDivider(),
+              const PopupMenuItem(
+                value: 'settings',
+                child: Row(
+                  children: [
+                    Icon(Icons.tune_rounded, size: 20),
+                    SizedBox(width: 12),
+                    Text('Settings'),
+                  ],
+                ),
+              ),
+            ],
           ),
           const SizedBox(width: 6),
         ],

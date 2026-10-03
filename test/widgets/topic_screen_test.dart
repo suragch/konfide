@@ -93,4 +93,29 @@ void main() {
     expect(tester.takeException(), isNull);
     expect(find.text('Conversations With...'), findsOneWidget);
   });
+
+  testWidgets('AppBar three dot menu opens and displays all action items',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.buildTheme(AppThemePreset.candlelight),
+        home: TopicScreen(onThemeChanged: (_) {}),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Verify three-dot menu button exists in AppBar
+    final menuButton = find.byTooltip('Menu');
+    expect(menuButton, findsOneWidget);
+
+    // Tap the three-dot menu
+    await tester.tap(menuButton);
+    await tester.pumpAndSettle();
+
+    // Verify all menu items appear
+    expect(find.text('Saved Questions'), findsOneWidget);
+    expect(find.text('Create Pack'), findsOneWidget);
+    expect(find.text('Import Pack'), findsOneWidget);
+    expect(find.text('Settings'), findsOneWidget);
+  });
 }

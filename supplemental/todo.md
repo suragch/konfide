@@ -7,4 +7,3 @@
 - Allow deletion, not just hiding (but can still restore to original)
 - Christian faith topic
 - Fix bottom system buttons hiding content on Android. Should still work on iOS.
-- Put the icons in a three dot menu
