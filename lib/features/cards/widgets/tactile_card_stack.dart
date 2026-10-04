@@ -12,7 +12,7 @@ class TactileCardStack extends StatefulWidget {
   final Color accentColor;
   final String companionName;
   final ValueChanged<int> onIndexChanged;
-  final ValueChanged<Question> onHideQuestion;
+  final ValueChanged<Question> onDeleteQuestion;
   final VoidCallback? onResetDeck;
 
   const TactileCardStack({
@@ -23,7 +23,7 @@ class TactileCardStack extends StatefulWidget {
     required this.accentColor,
     required this.companionName,
     required this.onIndexChanged,
-    required this.onHideQuestion,
+    required this.onDeleteQuestion,
     this.onResetDeck,
   });
 
@@ -363,8 +363,8 @@ class _TactileCardStackState extends State<TactileCardStack>
                               question: currentQuestion,
                               deckTitle: widget.deckTitle,
                               accentColor: widget.accentColor,
-                              onHideQuestion: () {
-                                widget.onHideQuestion(currentQuestion);
+                              onDeleteQuestion: () {
+                                widget.onDeleteQuestion(currentQuestion);
                               },
                             ),
                           ),

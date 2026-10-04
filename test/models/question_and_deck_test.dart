@@ -1,6 +1,4 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:konfide/core/models/deck.dart';
 import 'package:konfide/core/models/question.dart';
 import 'package:konfide/core/services/preset_deck_service.dart';
 
@@ -26,24 +24,6 @@ void main() {
       expect(restored, q);
     });
 
-    test('QuestionDeck filters hidden questions', () {
-      const deck = QuestionDeck(
-        id: 'test_deck',
-        title: 'Test Deck',
-        description: 'Description',
-        icon: Icons.chat_bubble_outline,
-        accentColor: Colors.brown,
-        questions: [
-          Question(id: 'q1', text: 'Text 1', deckId: 'test_deck'),
-          Question(id: 'q2', text: 'Text 2', deckId: 'test_deck'),
-          Question(id: 'q3', text: 'Text 3', deckId: 'test_deck'),
-        ],
-      );
-
-      final visible = deck.visibleQuestions({'q2'});
-      expect(visible.length, 2);
-      expect(visible.map((q) => q.id), ['q1', 'q3']);
-    });
 
     test('Curated decks loaded from assets has 6 rich packs with > 300 questions total', () async {
       final decks = await PresetDeckService.loadAllPresetDecks();

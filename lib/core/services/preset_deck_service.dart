@@ -16,6 +16,26 @@ class PresetDeckService {
     'assets/decks/deeply_personal.json',
   ];
 
+  /// Canonical IDs of the preset decks in order.
+  static const List<String> presetDeckIds = [
+    'getting_to_know_you',
+    'friends_and_family',
+    'couples_romance',
+    'family_generations',
+    'thought_provoking',
+    'deeply_personal',
+  ];
+
+  /// Compares two preset decks by their canonical asset ordering.
+  static int comparePresetDecks(QuestionDeck a, QuestionDeck b) {
+    final indexA = presetDeckIds.indexOf(a.id);
+    final indexB = presetDeckIds.indexOf(b.id);
+    if (indexA != -1 && indexB != -1) return indexA.compareTo(indexB);
+    if (indexA != -1) return -1;
+    if (indexB != -1) return 1;
+    return a.title.compareTo(b.title);
+  }
+
   /// Parses a preset deck JSON string into a [QuestionDeck].
   static QuestionDeck parsePresetDeckJson(String jsonString, {String? defaultId}) {
     if (jsonString.trim().isEmpty) {
@@ -101,5 +121,14 @@ class PresetDeckService {
     }
 
     return decks;
+  }
+
+  /// Loads a single preset deck by its ID from preset assets.
+  static Future<QuestionDeck?> loadPresetDeckById(String deckId, {AssetBundle? bundle}) async {
+    final decks = await loadAllPresetDecks(bundle: bundle);
+    for (final d in decks) {
+      if (d.id == deckId) return d;
+    }
+    return null;
   }
 }

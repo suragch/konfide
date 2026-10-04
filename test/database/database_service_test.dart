@@ -132,21 +132,22 @@ void main() {
       expect(notesAfter.containsKey('q_note_1'), isFalse);
     });
 
-    test('hidden questions and hidden decks', () async {
-      expect(await dbService.getHiddenQuestions(), isEmpty);
-      expect(await dbService.getHiddenDecks(), isEmpty);
+    test('deleteQuestion permanently deletes question and its favorites/notes', () async {
+      final deck = await dbService.getDeckById('getting_to_know_you');
+      expect(deck, isNotNull);
+      final questionId = deck!.questions.first.id;
 
-      await dbService.hideQuestion('q_skip_1');
-      expect(await dbService.getHiddenQuestions(), {'q_skip_1'});
+      await dbService.addFavorite(questionId);
+      await dbService.saveNote(questionId, 'A thoughtful answer');
+      expect(await dbService.getFavorites(), contains(questionId));
 
-      await dbService.unhideQuestion('q_skip_1');
-      expect(await dbService.getHiddenQuestions(), isEmpty);
+      await dbService.deleteQuestion(questionId);
 
-      await dbService.hideDeck('deck_hide_1');
-      expect(await dbService.getHiddenDecks(), {'deck_hide_1'});
-
-      await dbService.unhideDeck('deck_hide_1');
-      expect(await dbService.getHiddenDecks(), isEmpty);
+      final updatedDeck = await dbService.getDeckById('getting_to_know_you');
+      expect(updatedDeck!.questions.any((q) => q.id == questionId), isFalse);
+      expect(await dbService.getFavorites(), isNot(contains(questionId)));
+      final notes = await dbService.getNotes();
+      expect(notes.containsKey(questionId), isFalse);
     });
 
     test('syncPresetDecks inserts newly introduced preset decks automatically', () async {
@@ -236,6 +237,27 @@ void main() {
       // Verify user's favorite and note on vq_1 survived unharmed!
       expect(await dbService.getFavorites(), contains('vq_1'));
       expect((await dbService.getNotes())['vq_1'], 'Loved this answer!');
+    });
+
+    test('deleting a preset deck tracks it in deleted_preset_decks and syncPresetDecks ignores it', () async {
+      final initialPresets = await dbService.getDecks(isPreset: true);
+      expect(initialPresets.any((d) => d.id == 'getting_to_know_you'), isTrue);
+
+      // Delete the preset deck
+      await dbService.deleteDeck('getting_to_know_you');
+
+      // Verify it is gone from decks table
+      final afterDelete = await dbService.getDecks(isPreset: true);
+      expect(afterDelete.any((d) => d.id == 'getting_to_know_you'), isFalse);
+
+      // Verify it is recorded in deleted_preset_decks table
+      final deletedIds = await dbService.getDeletedPresetDeckIds();
+      expect(deletedIds, contains('getting_to_know_you'));
+
+      // Re-running syncPresetDecks should NOT resurrect the deleted preset deck
+      await dbService.syncPresetDecks(initialPresets);
+      final afterSync = await dbService.getDecks(isPreset: true);
+      expect(afterSync.any((d) => d.id == 'getting_to_know_you'), isFalse);
     });
   });
 }

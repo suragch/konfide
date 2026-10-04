@@ -89,14 +89,20 @@ void main() {
       expect(maryProgressUpdated.seenQuestionIds, ['q10']);
     });
 
-    test('hide and restore questions', () async {
-      expect(storage.getHiddenQuestionIds(), isEmpty);
+    test('deleteQuestion removes question from deck and favorites/notes', () async {
+      final deck = storage.getPresetDecks().first;
+      final qId = deck.questions.first.id;
 
-      await storage.hideQuestion('q_unwanted');
-      expect(storage.getHiddenQuestionIds(), {'q_unwanted'});
+      await storage.toggleFavorite(qId);
+      await storage.saveNote(qId, 'Nice memory');
+      expect(storage.isFavorite(qId), isTrue);
 
-      await storage.unhideQuestion('q_unwanted');
-      expect(storage.getHiddenQuestionIds(), isEmpty);
+      await storage.deleteQuestion(qId);
+
+      final updatedDeck = storage.getPresetDecks().firstWhere((d) => d.id == deck.id);
+      expect(updatedDeck.questions.any((q) => q.id == qId), isFalse);
+      expect(storage.isFavorite(qId), isFalse);
+      expect(storage.getNote(qId), isNull);
     });
 
     test('favorites and personal reflection notes', () async {
@@ -201,10 +207,34 @@ void main() {
       expect(storage.getCustomDecks().first.questions.first.text, 'What is your best memory of us?');
     });
 
-    test('restorePresetDecks restores curated decks', () async {
-      await storage.restorePresetDecks();
-      expect(storage.getPresetDecks().length, 6);
+    test('saveDeck allows customizing preset deck in place', () async {
+      final original = storage.getPresetDecks().firstWhere((d) => d.id == 'getting_to_know_you');
+      final customized = original.copyWith(
+        title: 'Customized Getting to Know You',
+        questions: [
+          const Question(id: 'q_custom_1', text: 'Custom first question?', deckId: 'getting_to_know_you'),
+        ],
+      );
+
+      await storage.saveDeck(customized);
+
+      final updated = storage.getPresetDecks().firstWhere((d) => d.id == 'getting_to_know_you');
+      expect(updated.title, 'Customized Getting to Know You');
+      expect(updated.questions.length, 1);
+      expect(updated.questions.first.text, 'Custom first question?');
+      expect(updated.isCustom, isFalse);
     });
+
+    test('deleteDeck permanently removes preset deck', () async {
+      final initialPresets = storage.getPresetDecks();
+      expect(initialPresets.length, 6);
+      expect(initialPresets.any((d) => d.id == 'getting_to_know_you'), isTrue);
+
+      await storage.deleteDeck('getting_to_know_you');
+      expect(storage.getPresetDecks().length, 5);
+      expect(storage.getPresetDecks().any((d) => d.id == 'getting_to_know_you'), isFalse);
+    });
+
   });
 }
 

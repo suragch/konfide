@@ -74,12 +74,13 @@ class _CustomDeckScreenState extends State<CustomDeckScreen> {
                   if (questionToEdit != null && editIndex != null) {
                     _questions[editIndex] = questionToEdit.copyWith(text: text);
                   } else {
+                    final isCustom = widget.initialDeck?.isCustom ?? true;
                     _questions.add(
                       Question(
                         id: 'custom_${const Uuid().v4()}',
                         text: text,
                         deckId: widget.initialDeck?.id ?? 'custom_deck',
-                        isCustom: true,
+                        isCustom: isCustom,
                       ),
                     );
                   }
@@ -111,9 +112,10 @@ class _CustomDeckScreenState extends State<CustomDeckScreen> {
       return;
     }
 
+    final isCustom = widget.initialDeck?.isCustom ?? true;
     final deckId = widget.initialDeck?.id ?? 'custom_${const Uuid().v4()}';
     final updatedQuestions = _questions
-        .map((q) => q.copyWith(deckId: deckId, isCustom: true))
+        .map((q) => q.copyWith(deckId: deckId))
         .toList();
 
     final deck = QuestionDeck(
@@ -121,14 +123,15 @@ class _CustomDeckScreenState extends State<CustomDeckScreen> {
       title: title,
       description: _descriptionController.text.trim().isNotEmpty
           ? _descriptionController.text.trim()
-          : 'Personal questions created by you.',
-      icon: Icons.chat_bubble_outline,
-      accentColor: const Color(0xFFD97736),
+          : (isCustom ? 'Personal questions created by you.' : ''),
+      icon: widget.initialDeck?.icon ?? Icons.chat_bubble_outline,
+      accentColor: widget.initialDeck?.accentColor ?? const Color(0xFFD97736),
       questions: updatedQuestions,
-      isCustom: true,
+      isCustom: isCustom,
+      version: widget.initialDeck?.version ?? 1,
     );
 
-    await _storage.saveCustomDeck(deck);
+    await _storage.saveDeck(deck);
     await HapticService.selection();
 
     if (mounted) {
@@ -142,7 +145,11 @@ class _CustomDeckScreenState extends State<CustomDeckScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.initialDeck == null ? 'New Pack' : 'Edit Pack'),
+        title: Text(
+          widget.initialDeck == null
+              ? 'New Pack'
+              : (widget.initialDeck!.isCustom ? 'Edit Pack' : 'Customize Pack'),
+        ),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 12.0),

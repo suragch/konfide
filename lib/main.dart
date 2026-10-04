@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:konfide/core/services/storage_service.dart';
 import 'package:konfide/core/theme/app_theme.dart';
 import 'package:konfide/features/topics/topic_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  GoogleFonts.config.allowRuntimeFetching = false;
   final storage = await StorageService.init();
   final initialPreset =
       AppThemePreset.fromString(storage.getThemePreset());

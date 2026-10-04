@@ -9,7 +9,7 @@ class TactileCard extends StatelessWidget {
   final Question question;
   final String deckTitle;
   final Color accentColor;
-  final VoidCallback? onHideQuestion;
+  final VoidCallback? onDeleteQuestion;
   final VoidCallback? onFavoriteToggled;
 
   const TactileCard({
@@ -17,7 +17,7 @@ class TactileCard extends StatelessWidget {
     required this.question,
     required this.deckTitle,
     required this.accentColor,
-    this.onHideQuestion,
+    this.onDeleteQuestion,
     this.onFavoriteToggled,
   });
 
@@ -77,17 +77,17 @@ class TactileCard extends StatelessWidget {
     );
   }
 
-  void _confirmHide(BuildContext context) {
+  void _confirmDelete(BuildContext context) {
     showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(
-          'Hide Question?',
+          'Delete Question?',
           style: GoogleFonts.newsreader(fontWeight: FontWeight.w600),
         ),
         content: const Text(
-          'This question will be removed from your deck. You can restore it anytime in Settings.',
+          'This question will be permanently deleted from this pack.',
         ),
         actions: [
           TextButton(
@@ -98,9 +98,9 @@ class TactileCard extends StatelessWidget {
             style: FilledButton.styleFrom(backgroundColor: Colors.redAccent),
             onPressed: () {
               Navigator.of(context).pop();
-              onHideQuestion?.call();
+              onDeleteQuestion?.call();
             },
-            child: const Text('Hide Question'),
+            child: const Text('Delete Question'),
           ),
         ],
       ),
@@ -194,13 +194,13 @@ class TactileCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
                     IconButton(
-                      tooltip: 'Hide this question',
+                      tooltip: 'Delete question',
                       icon: Icon(
-                        Icons.visibility_off_outlined,
+                        Icons.delete_outline_rounded,
                         size: 20,
                         color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
                       ),
-                      onPressed: () => _confirmHide(context),
+                      onPressed: () => _confirmDelete(context),
                     ),
                   ],
                 ),

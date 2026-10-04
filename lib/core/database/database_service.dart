@@ -46,6 +46,7 @@ class DatabaseService {
         ),
       );
       final service = DatabaseService._(db);
+      await service._initDeletedPresetTable();
       await service.syncPresetDecks(presets);
       return service;
     }
@@ -66,8 +67,17 @@ class DatabaseService {
     );
 
     final service = DatabaseService._(db);
+    await service._initDeletedPresetTable();
     await service.syncPresetDecks(presets);
     return service;
+  }
+
+  Future<void> _initDeletedPresetTable() async {
+    await _db.execute('''
+      CREATE TABLE IF NOT EXISTS deleted_preset_decks (
+        deck_id TEXT PRIMARY KEY
+      )
+    ''');
   }
 
   static Future<void> _onConfigure(Database db) async {
@@ -142,16 +152,9 @@ class DatabaseService {
       )
     ''');
 
-    // 7. Hidden Questions table
+    // 7. Deleted Preset Decks table
     await db.execute('''
-      CREATE TABLE hidden_questions (
-        question_id TEXT PRIMARY KEY
-      )
-    ''');
-
-    // 8. Hidden Decks table
-    await db.execute('''
-      CREATE TABLE hidden_decks (
+      CREATE TABLE IF NOT EXISTS deleted_preset_decks (
         deck_id TEXT PRIMARY KEY
       )
     ''');
@@ -404,7 +407,23 @@ class DatabaseService {
   }
 
   Future<void> deleteDeck(String deckId) async {
+    final rows = await _db.query(
+      'decks',
+      columns: ['is_preset'],
+      where: 'id = ?',
+      whereArgs: [deckId],
+    );
+    final isPreset = rows.isNotEmpty && (rows.first['is_preset'] as int? ?? 0) == 1;
+
     await _db.delete('decks', where: 'id = ?', whereArgs: [deckId]);
+
+    if (isPreset) {
+      await _db.insert(
+        'deleted_preset_decks',
+        {'deck_id': deckId},
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    }
   }
 
   /// Synchronizes preset decks from assets into SQLite.
@@ -423,7 +442,13 @@ class DatabaseService {
         r['id'] as String: (r['version'] as int? ?? 1),
     };
 
+    final deletedPresetIds = await getDeletedPresetDeckIds();
+
     for (final assetDeck in assetPresets) {
+      if (deletedPresetIds.contains(assetDeck.id)) {
+        continue;
+      }
+
       if (!dbDeckVersions.containsKey(assetDeck.id)) {
         // Newly added preset deck in this app update!
         await _insertDeckInternal(_db, assetDeck, isPreset: true);
@@ -497,12 +522,11 @@ class DatabaseService {
     }
   }
 
-  /// Restores default curated preset decks from assets.
-  Future<void> restorePresetDecks([List<QuestionDeck>? presets]) async {
-    final toRestore = presets ?? await PresetDeckService.loadAllPresetDecks();
-    for (final deck in toRestore) {
-      await saveDeck(deck, isPreset: true);
-    }
+
+  /// Returns all deleted preset deck IDs.
+  Future<Set<String>> getDeletedPresetDeckIds() async {
+    final rows = await _db.query('deleted_preset_decks');
+    return rows.map((r) => r['deck_id'] as String).toSet();
   }
 
   // ==================== FAVORITES ====================
@@ -557,54 +581,13 @@ class DatabaseService {
     }
   }
 
-  // ==================== HIDDEN QUESTIONS ====================
+  // ==================== DELETE QUESTION ====================
 
-  Future<Set<String>> getHiddenQuestions() async {
-    final rows = await _db.query('hidden_questions');
-    return rows.map((r) => r['question_id'] as String).toSet();
-  }
-
-  Future<void> hideQuestion(String questionId) async {
-    await _db.insert(
-      'hidden_questions',
-      {'question_id': questionId},
-      conflictAlgorithm: ConflictAlgorithm.ignore,
-    );
-  }
-
-  Future<void> unhideQuestion(String questionId) async {
-    await _db.delete(
-      'hidden_questions',
-      where: 'question_id = ?',
-      whereArgs: [questionId],
-    );
-  }
-
-  Future<void> unhideAllQuestions() async {
-    await _db.delete('hidden_questions');
-  }
-
-  // ==================== HIDDEN DECKS ====================
-
-  Future<Set<String>> getHiddenDecks() async {
-    final rows = await _db.query('hidden_decks');
-    return rows.map((r) => r['deck_id'] as String).toSet();
-  }
-
-  Future<void> hideDeck(String deckId) async {
-    await _db.insert(
-      'hidden_decks',
-      {'deck_id': deckId},
-      conflictAlgorithm: ConflictAlgorithm.ignore,
-    );
-  }
-
-  Future<void> unhideDeck(String deckId) async {
-    await _db.delete(
-      'hidden_decks',
-      where: 'deck_id = ?',
-      whereArgs: [deckId],
-    );
+  /// Permanently deletes a question and any associated favorites and notes.
+  Future<void> deleteQuestion(String questionId) async {
+    await _db.delete('questions', where: 'id = ?', whereArgs: [questionId]);
+    await _db.delete('favorites', where: 'question_id = ?', whereArgs: [questionId]);
+    await _db.delete('notes', where: 'question_id = ?', whereArgs: [questionId]);
   }
 
   // ==================== LIFECYCLE ====================

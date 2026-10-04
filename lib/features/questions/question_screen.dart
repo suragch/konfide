@@ -52,9 +52,8 @@ class _QuestionScreenState extends State<QuestionScreen> {
 
   void _loadDeckData() {
     _activeCompanion = _storage.getActiveCompanion();
-    final hiddenQuestionIds = _storage.getHiddenQuestionIds();
-
-    _questions = widget.deck.visibleQuestions(hiddenQuestionIds);
+    final currentDeck = _storage.getDeckById(widget.deck.id) ?? widget.deck;
+    _questions = currentDeck.questions;
 
     final progress = _storage.getProgress(_activeCompanion.id, widget.deck.id);
     _currentIndex = progress.currentIndex.clamp(
@@ -82,29 +81,23 @@ class _QuestionScreenState extends State<QuestionScreen> {
     }
   }
 
-  void _hideQuestion(Question question) async {
+  void _deleteQuestion(Question question) async {
     await HapticService.heavy();
-    await _storage.hideQuestion(question.id);
+    await _storage.deleteQuestion(question.id);
 
     setState(() {
       _loadDeckData();
     });
 
     if (mounted) {
+      ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Question hidden from deck'),
-          action: SnackBarAction(
-            label: 'Undo',
-            onPressed: () async {
-              await _storage.unhideQuestion(question.id);
-              if (mounted) {
-                setState(() {
-                  _loadDeckData();
-                });
-              }
-            },
-          ),
+        const SnackBar(
+          content: Text('Question deleted'),
+          duration: Duration(seconds: 3),
+          persist: false,
+          behavior: SnackBarBehavior.floating,
+          showCloseIcon: true,
         ),
       );
     }
@@ -282,7 +275,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
           accentColor: widget.deck.accentColor,
           companionName: _activeCompanion.name,
           onIndexChanged: _onIndexChanged,
-          onHideQuestion: _hideQuestion,
+          onDeleteQuestion: _deleteQuestion,
           onResetDeck: () async {
             await _storage.resetProgress(_activeCompanion.id, widget.deck.id);
             setState(() {

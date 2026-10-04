@@ -71,4 +71,47 @@ void main() {
     expect(find.byIcon(Icons.star_outline_rounded), findsOneWidget);
     expect(find.byIcon(Icons.star_rounded), findsNothing);
   });
+
+  testWidgets('TactileCard delete button shows confirmation and calls onDeleteQuestion',
+      (WidgetTester tester) async {
+    bool deleted = false;
+    const question = Question(
+      id: 'q_test_del',
+      text: 'Question to delete',
+      deckId: 'getting_to_know_you',
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.buildTheme(AppThemePreset.candlelight),
+        home: Scaffold(
+          body: Center(
+            child: TactileCard(
+              question: question,
+              deckTitle: 'Getting to Know You',
+              accentColor: const Color(0xFFD97736),
+              onDeleteQuestion: () {
+                deleted = true;
+              },
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Tap delete icon
+    await tester.tap(find.byIcon(Icons.delete_outline_rounded));
+    await tester.pumpAndSettle();
+
+    // Verify dialog
+    expect(find.text('Delete Question?'), findsOneWidget);
+    expect(find.text('This question will be permanently deleted from this pack.'), findsOneWidget);
+
+    // Tap Delete Question
+    await tester.tap(find.widgetWithText(FilledButton, 'Delete Question'));
+    await tester.pumpAndSettle();
+
+    expect(deleted, isTrue);
+  });
 }

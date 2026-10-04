@@ -7,6 +7,7 @@ import 'package:konfide/core/models/companion.dart';
 import 'package:konfide/core/models/deck_progress.dart';
 import 'package:konfide/core/models/deck.dart';
 import 'package:konfide/core/models/question.dart';
+import 'package:konfide/core/services/preset_deck_service.dart';
 
 class StorageService extends ChangeNotifier {
   static late StorageService _instance;
@@ -22,8 +23,6 @@ class StorageService extends ChangeNotifier {
   final List<QuestionDeck> _customDecks = [];
   final Set<String> _favorites = {};
   final Map<String, String> _notes = {};
-  final Set<String> _hiddenQuestions = {};
-  final Set<String> _hiddenDecks = {};
 
   StorageService._(this._prefs, this._db);
 
@@ -56,6 +55,7 @@ class StorageService extends ChangeNotifier {
 
     _presetDecks.clear();
     _presetDecks.addAll(await _db.getDecks(isPreset: true));
+    _presetDecks.sort(PresetDeckService.comparePresetDecks);
 
     _customDecks.clear();
     _customDecks.addAll(await _db.getDecks(isPreset: false));
@@ -65,12 +65,6 @@ class StorageService extends ChangeNotifier {
 
     _notes.clear();
     _notes.addAll(await _db.getNotes());
-
-    _hiddenQuestions.clear();
-    _hiddenQuestions.addAll(await _db.getHiddenQuestions());
-
-    _hiddenDecks.clear();
-    _hiddenDecks.addAll(await _db.getHiddenDecks());
   }
 
   // --- Simple User Settings Keys (SharedPreferences) ---
@@ -199,6 +193,22 @@ class StorageService extends ChangeNotifier {
     return null;
   }
 
+  Future<void> saveDeck(QuestionDeck deck) async {
+    if (deck.isCustom) {
+      await saveCustomDeck(deck);
+    } else {
+      final index = _presetDecks.indexWhere((d) => d.id == deck.id);
+      if (index >= 0) {
+        _presetDecks[index] = deck;
+      } else {
+        _presetDecks.add(deck);
+      }
+      _presetDecks.sort(PresetDeckService.comparePresetDecks);
+      notifyListeners();
+      await _db.saveDeck(deck, isPreset: true);
+    }
+  }
+
   Future<void> saveCustomDeck(QuestionDeck deck) async {
     final customDeck = deck.copyWith(isCustom: true);
     final index = _customDecks.indexWhere((d) => d.id == customDeck.id);
@@ -211,11 +221,14 @@ class StorageService extends ChangeNotifier {
     await _db.saveDeck(customDeck, isPreset: false);
   }
 
-  Future<void> deleteCustomDeck(String deckId) async {
+  Future<void> deleteDeck(String deckId) async {
     _customDecks.removeWhere((d) => d.id == deckId);
+    _presetDecks.removeWhere((d) => d.id == deckId);
     notifyListeners();
     await _db.deleteDeck(deckId);
   }
+
+  Future<void> deleteCustomDeck(String deckId) => deleteDeck(deckId);
 
   /// Duplicates any deck (preset or custom) into a new, editable custom deck.
   Future<QuestionDeck> duplicateDeck(
@@ -251,54 +264,30 @@ class StorageService extends ChangeNotifier {
     await saveCustomDeck(deck);
   }
 
-  /// Restores default curated preset decks.
-  Future<void> restorePresetDecks() async {
-    await _db.restorePresetDecks();
-    _presetDecks.clear();
-    _presetDecks.addAll(await _db.getDecks(isPreset: true));
+  // ==================== DELETE QUESTION (SQLite) ====================
+
+  /// Permanently deletes a question from its deck.
+  Future<void> deleteQuestion(String questionId) async {
+    _favorites.remove(questionId);
+    _notes.remove(questionId);
+    for (var i = 0; i < _presetDecks.length; i++) {
+      final d = _presetDecks[i];
+      if (d.questions.any((q) => q.id == questionId)) {
+        _presetDecks[i] = d.copyWith(
+          questions: d.questions.where((q) => q.id != questionId).toList(),
+        );
+      }
+    }
+    for (var i = 0; i < _customDecks.length; i++) {
+      final d = _customDecks[i];
+      if (d.questions.any((q) => q.id == questionId)) {
+        _customDecks[i] = d.copyWith(
+          questions: d.questions.where((q) => q.id != questionId).toList(),
+        );
+      }
+    }
     notifyListeners();
-  }
-
-  // ==================== HIDDEN QUESTIONS (SQLite) ====================
-
-  Set<String> getHiddenQuestionIds() {
-    return Set.unmodifiable(_hiddenQuestions);
-  }
-
-  Future<void> hideQuestion(String questionId) async {
-    _hiddenQuestions.add(questionId);
-    notifyListeners();
-    await _db.hideQuestion(questionId);
-  }
-
-  Future<void> unhideQuestion(String questionId) async {
-    _hiddenQuestions.remove(questionId);
-    notifyListeners();
-    await _db.unhideQuestion(questionId);
-  }
-
-  Future<void> unhideAllQuestions() async {
-    _hiddenQuestions.clear();
-    notifyListeners();
-    await _db.unhideAllQuestions();
-  }
-
-  // ==================== HIDDEN DECKS (SQLite) ====================
-
-  Set<String> getHiddenDeckIds() {
-    return Set.unmodifiable(_hiddenDecks);
-  }
-
-  Future<void> hideDeck(String deckId) async {
-    _hiddenDecks.add(deckId);
-    notifyListeners();
-    await _db.hideDeck(deckId);
-  }
-
-  Future<void> unhideDeck(String deckId) async {
-    _hiddenDecks.remove(deckId);
-    notifyListeners();
-    await _db.unhideDeck(deckId);
+    await _db.deleteQuestion(questionId);
   }
 
   // ==================== FAVORITES & NOTES (SQLite) ====================
@@ -348,4 +337,11 @@ class StorageService extends ChangeNotifier {
     await _prefs.setString(_keyThemePreset, preset);
     notifyListeners();
   }
+
+  // ==================== LIFECYCLE ====================
+
+  Future<void> close() async {
+    await _db.close();
+  }
 }
+

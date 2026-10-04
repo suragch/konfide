@@ -60,47 +60,42 @@ class _TopicScreenState extends State<TopicScreen> {
     }
   }
 
-  void _hideDeck(QuestionDeck deck) async {
-    await HapticService.heavy();
-    await _storage.hideDeck(deck.id);
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Hidden "${deck.title}" pack'),
-          action: SnackBarAction(
-            label: 'Undo',
-            onPressed: () async {
-              await _storage.unhideDeck(deck.id);
-            },
-          ),
-        ),
-      );
-    }
-  }
-
-  void _confirmDeleteCustomDeck(QuestionDeck deck) {
+  void _confirmDeleteDeck(QuestionDeck deck) {
     showDialog<void>(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(
           'Delete "${deck.title}"?',
           style: GoogleFonts.newsreader(fontWeight: FontWeight.w600),
         ),
         content: const Text(
-          'This will permanently delete this custom pack and its questions.',
+          'This will permanently delete this pack and its questions.',
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => Navigator.of(dialogContext).pop(),
             child: const Text('Cancel'),
           ),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: Colors.redAccent),
             onPressed: () async {
-              await _storage.deleteCustomDeck(deck.id);
+              Navigator.of(dialogContext).pop();
+              final deleteFuture = _storage.deleteDeck(deck.id);
               await HapticService.medium();
-              if (context.mounted) Navigator.of(context).pop();
+              if (mounted) {
+                ScaffoldMessenger.of(context).clearSnackBars();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Deleted "${deck.title}" pack'),
+                    duration: const Duration(seconds: 3),
+                    persist: false,
+                    behavior: SnackBarBehavior.floating,
+                    showCloseIcon: true,
+                  ),
+                );
+              }
+              await deleteFuture;
             },
             child: const Text('Delete'),
           ),
@@ -112,7 +107,7 @@ class _TopicScreenState extends State<TopicScreen> {
   void _resetDeckProgress(QuestionDeck deck, Companion companion) {
     showDialog<void>(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(
           'Reset Progress?',
@@ -123,14 +118,14 @@ class _TopicScreenState extends State<TopicScreen> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => Navigator.of(dialogContext).pop(),
             child: const Text('Cancel'),
           ),
           FilledButton(
             onPressed: () async {
+              Navigator.of(dialogContext).pop();
               await _storage.resetProgress(companion.id, deck.id);
               await HapticService.selection();
-              if (context.mounted) Navigator.of(context).pop();
             },
             child: const Text('Reset'),
           ),
@@ -143,13 +138,8 @@ class _TopicScreenState extends State<TopicScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final activeCompanion = _storage.getActiveCompanion();
-    final hiddenDeckIds = _storage.getHiddenDeckIds();
-    final hiddenQuestionIds = _storage.getHiddenQuestionIds();
-
     final presetDecks = _storage.getPresetDecks();
-    final visibleCurated = presetDecks
-        .where((d) => !hiddenDeckIds.contains(d.id))
-        .toList();
+    final visibleCurated = presetDecks;
 
     final customDecks = _storage.getCustomDecks();
     final favoritesCount = _storage.getFavorites().length;
@@ -438,14 +428,31 @@ class _TopicScreenState extends State<TopicScreen> {
           const SizedBox(height: 12),
 
           // Curated Decks List
-          ...visibleCurated.map((deck) {
-            final visibleQuestions = deck.visibleQuestions(hiddenQuestionIds);
+          if (visibleCurated.isEmpty)
+            Card(
+              margin: const EdgeInsets.symmetric(vertical: 8.0),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(
+                  color: theme.dividerColor.withValues(alpha: 0.15),
+                ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Text(
+                  'No standard packs available.',
+                  style: theme.textTheme.bodyMedium,
+                ),
+              ),
+            )
+          else
+            ...visibleCurated.map((deck) {
             final progress =
                 _storage.getProgress(activeCompanion.id, deck.id);
             final seenCount = progress.seenQuestionIds
-                .where((id) => visibleQuestions.any((q) => q.id == id))
+                .where((id) => deck.questions.any((q) => q.id == id))
                 .length;
-            final totalCount = visibleQuestions.length;
+            final totalCount = deck.questions.length;
             final progressFraction = totalCount > 0 ? (seenCount / totalCount) : 0.0;
 
             return Card(
@@ -502,34 +509,31 @@ class _TopicScreenState extends State<TopicScreen> {
                                             BorderRadius.circular(16),
                                       ),
                                       onSelected: (val) async {
-                                        if (val == 'reset') {
-                                          _resetDeckProgress(
-                                              deck, activeCompanion);
-                                        } else if (val == 'hide') {
-                                          _hideDeck(deck);
-                                        } else if (val == 'duplicate') {
-                                          final copy = await _storage.duplicateDeck(deck);
-                                          if (context.mounted) {
-                                            Navigator.of(context).push(
-                                              MaterialPageRoute<void>(
-                                                builder: (_) => CustomDeckScreen(initialDeck: copy),
-                                              ),
-                                            );
-                                          }
+                                        if (val == 'customize') {
+                                          Navigator.of(context).push(
+                                            MaterialPageRoute<void>(
+                                              builder: (_) => CustomDeckScreen(initialDeck: deck),
+                                            ),
+                                          );
                                         } else if (val == 'export') {
                                           await DeckExchangeService.shareDeckFile(context, deck);
+                                        } else if (val == 'reset') {
+                                          _resetDeckProgress(
+                                              deck, activeCompanion);
+                                        } else if (val == 'delete') {
+                                          _confirmDeleteDeck(deck);
                                         }
                                       },
                                       itemBuilder: (context) => [
                                         const PopupMenuItem(
-                                          value: 'duplicate',
+                                          value: 'customize',
                                           child: Row(
                                             children: [
-                                              Icon(Icons.copy_rounded, size: 18),
+                                              Icon(Icons.edit_outlined, size: 18),
                                               SizedBox(width: 8),
                                               Expanded(
                                                 child: Text(
-                                                  'Duplicate & Customize',
+                                                  'Customize',
                                                   maxLines: 1,
                                                   overflow: TextOverflow.ellipsis,
                                                 ),
@@ -555,12 +559,38 @@ class _TopicScreenState extends State<TopicScreen> {
                                         ),
                                         PopupMenuItem(
                                           value: 'reset',
-                                          child: Text(
-                                              'Reset progress for ${activeCompanion.name}'),
+                                          child: Row(
+                                            children: [
+                                              const Icon(Icons.refresh_rounded, size: 18),
+                                              const SizedBox(width: 8),
+                                              Expanded(
+                                                child: Text(
+                                                  'Reset progress for ${activeCompanion.name}',
+                                                  maxLines: 1,
+                                                  overflow: TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                         const PopupMenuItem(
-                                          value: 'hide',
-                                          child: Text('Hide this pack'),
+                                          value: 'delete',
+                                          child: Row(
+                                            children: [
+                                              Icon(Icons.delete_outline_rounded,
+                                                  size: 18, color: Colors.redAccent),
+                                              SizedBox(width: 8),
+                                              Expanded(
+                                                child: Text(
+                                                  'Delete Pack',
+                                                  style: TextStyle(
+                                                      color: Colors.redAccent),
+                                                  maxLines: 1,
+                                                  overflow: TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ],
                                     ),
@@ -716,14 +746,12 @@ class _TopicScreenState extends State<TopicScreen> {
             )
           else
             ...customDecks.map((deck) {
-              final visibleQuestions =
-                  deck.visibleQuestions(hiddenQuestionIds);
               final progress =
                   _storage.getProgress(activeCompanion.id, deck.id);
+              final totalCount = deck.questions.length;
               final seenCount = progress.seenQuestionIds
-                  .where((id) => visibleQuestions.any((q) => q.id == id))
+                  .where((id) => deck.questions.any((q) => q.id == id))
                   .length;
-              final totalCount = visibleQuestions.length;
               final progressFraction =
                   totalCount > 0 ? (seenCount / totalCount) : 0.0;
 
@@ -805,7 +833,7 @@ class _TopicScreenState extends State<TopicScreen> {
                                           } else if (val == 'reset') {
                                             _resetDeckProgress(deck, activeCompanion);
                                           } else if (val == 'delete') {
-                                            _confirmDeleteCustomDeck(deck);
+                                            _confirmDeleteDeck(deck);
                                           }
                                         },
                                         itemBuilder: (context) => [
@@ -859,7 +887,19 @@ class _TopicScreenState extends State<TopicScreen> {
                                           ),
                                           PopupMenuItem(
                                             value: 'reset',
-                                            child: Text('Reset progress for ${activeCompanion.name}'),
+                                            child: Row(
+                                              children: [
+                                                const Icon(Icons.refresh_rounded, size: 18),
+                                                const SizedBox(width: 8),
+                                                Expanded(
+                                                  child: Text(
+                                                    'Reset progress for ${activeCompanion.name}',
+                                                    maxLines: 1,
+                                                    overflow: TextOverflow.ellipsis,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                           const PopupMenuItem(
                                             value: 'delete',

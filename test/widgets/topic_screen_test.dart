@@ -118,4 +118,94 @@ void main() {
     expect(find.text('Import Pack'), findsOneWidget);
     expect(find.text('Settings'), findsOneWidget);
   });
+
+  testWidgets('Preset topic card menu displays Customize, Reset progress, and Delete Pack',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.buildTheme(AppThemePreset.candlelight),
+        home: TopicScreen(onThemeChanged: (_) {}),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Find the more_horiz icon on the first topic card
+    final cardMenuFinder = find.byIcon(Icons.more_horiz_rounded);
+    expect(cardMenuFinder, findsWidgets);
+
+    // Tap the menu on the first curated deck card
+    await tester.tap(cardMenuFinder.first);
+    await tester.pumpAndSettle();
+
+    // Verify menu items
+    expect(find.text('Customize'), findsOneWidget);
+    expect(find.text('Restore to Original'), findsNothing);
+    expect(find.text('Reset progress for General'), findsOneWidget);
+    expect(find.byIcon(Icons.refresh_rounded), findsOneWidget);
+    expect(find.text('Delete Pack'), findsOneWidget);
+    // Ensure old duplicate & hide are gone
+    expect(find.text('Duplicate & Customize'), findsNothing);
+    expect(find.text('Hide this pack'), findsNothing);
+  });
+
+  testWidgets('Tapping Customize on preset card opens Customize Pack screen',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.buildTheme(AppThemePreset.candlelight),
+        home: TopicScreen(onThemeChanged: (_) {}),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Tap popup menu on the first curated deck
+    await tester.tap(find.byIcon(Icons.more_horiz_rounded).first);
+    await tester.pumpAndSettle();
+
+    // Tap Customize
+    await tester.tap(find.text('Customize'));
+    await tester.pumpAndSettle();
+
+    // Should open CustomDeckScreen with 'Customize Pack'
+    expect(find.text('Customize Pack'), findsOneWidget);
+  });
+
+  testWidgets('Deleting a preset pack removes it permanently',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.buildTheme(AppThemePreset.candlelight),
+        home: TopicScreen(onThemeChanged: (_) {}),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final firstPresetTitle = StorageService.instance.getPresetDecks().first.title;
+    expect(find.text(firstPresetTitle), findsOneWidget);
+
+    // Tap popup menu on the first curated deck
+    await tester.tap(find.byIcon(Icons.more_horiz_rounded).first);
+    await tester.pumpAndSettle();
+
+    // Tap Delete Pack
+    await tester.tap(find.text('Delete Pack'));
+    await tester.pumpAndSettle();
+
+    // Confirm dialog is shown
+    expect(find.text('Delete "$firstPresetTitle"?'), findsOneWidget);
+    expect(
+      find.text('This will permanently delete this pack and its questions.'),
+      findsOneWidget,
+    );
+
+    // Tap Delete button in the dialog
+    final deleteButton = find.widgetWithText(FilledButton, 'Delete');
+    await tester.tap(deleteButton);
+    await tester.pumpAndSettle();
+
+    // Pack is removed from the visible list
+    expect(find.text(firstPresetTitle), findsNothing);
+    expect(find.text('Deleted "$firstPresetTitle" pack'), findsOneWidget);
+    expect(find.text('Undo'), findsNothing);
+  });
 }

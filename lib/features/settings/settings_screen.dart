@@ -16,38 +16,11 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   final StorageService _storage = StorageService.instance;
 
-  void _restoreHiddenQuestions() async {
-    await _storage.unhideAllQuestions();
-    await HapticService.selection();
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('All hidden questions restored')),
-      );
-      setState(() {});
-    }
-  }
-
-  void _restoreHiddenDecks() async {
-    final hidden = _storage.getHiddenDeckIds().toList();
-    for (final id in hidden) {
-      await _storage.unhideDeck(id);
-    }
-    await HapticService.selection();
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('All hidden packs restored')),
-      );
-      setState(() {});
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final currentPresetName = _storage.getThemePreset();
     final currentPreset = AppThemePreset.fromString(currentPresetName);
-    final hiddenQuestionsCount = _storage.getHiddenQuestionIds().length;
-    final hiddenDecksCount = _storage.getHiddenDeckIds().length;
 
     return Scaffold(
       appBar: AppBar(
@@ -128,81 +101,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             );
           }),
-
-          const SizedBox(height: 28),
-          const Divider(),
-          const SizedBox(height: 16),
-
-          // Content Management Section
-          Text(
-            'Hidden & Deleted Content',
-            style: GoogleFonts.newsreader(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            'Manage questions and packs you chose to hide from your decks.',
-            style: theme.textTheme.bodySmall,
-          ),
-          const SizedBox(height: 14),
-
-          Card(
-            child: ListTile(
-              title: const Text('Hidden Questions'),
-              subtitle: Text(
-                hiddenQuestionsCount == 0
-                    ? 'No questions are hidden'
-                    : '$hiddenQuestionsCount question${hiddenQuestionsCount == 1 ? '' : 's'} hidden',
-              ),
-              trailing: hiddenQuestionsCount > 0
-                  ? TextButton(
-                      onPressed: _restoreHiddenQuestions,
-                      child: const Text('Restore All'),
-                    )
-                  : null,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Card(
-            child: ListTile(
-              title: const Text('Hidden Packs'),
-              subtitle: Text(
-                hiddenDecksCount == 0
-                    ? 'No packs are hidden'
-                    : '$hiddenDecksCount pack${hiddenDecksCount == 1 ? '' : 's'} hidden',
-              ),
-              trailing: hiddenDecksCount > 0
-                  ? TextButton(
-                      onPressed: _restoreHiddenDecks,
-                      child: const Text('Restore All'),
-                    )
-                  : null,
-            ),
-          ),
-          Card(
-            child: ListTile(
-              title: const Text('Restore Standard Packs'),
-              subtitle: const Text(
-                'Restore standard question packs if modified or missing.',
-              ),
-              trailing: TextButton(
-                onPressed: () async {
-                  await _storage.restorePresetDecks();
-                  await HapticService.selection();
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Standard question packs restored'),
-                      ),
-                    );
-                  }
-                },
-                child: const Text('Restore'),
-              ),
-            ),
-          ),
 
           const SizedBox(height: 28),
           const Divider(),

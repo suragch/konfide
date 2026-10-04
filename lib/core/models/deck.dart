@@ -22,12 +22,6 @@ class QuestionDeck {
     this.version = 1,
   });
 
-  /// Returns questions filtering out any that the user has hidden/deleted.
-  List<Question> visibleQuestions(Set<String> hiddenQuestionIds) {
-    return questions
-        .where((q) => !hiddenQuestionIds.contains(q.id))
-        .toList();
-  }
 
   QuestionDeck copyWith({
     String? id,
