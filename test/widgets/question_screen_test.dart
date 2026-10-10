@@ -106,4 +106,29 @@ void main() {
     expect(find.text('Card 1 of 3'), findsOneWidget);
     expect(find.text('First question text?'), findsOneWidget);
   });
+
+  testWidgets('Previous and next buttons match deck accentColor when enabled',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.buildTheme(AppThemePreset.candlelight),
+        home: QuestionScreen(deck: testDeck),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final nextButton = tester.widget<IconButton>(
+      find.widgetWithIcon(IconButton, Icons.arrow_forward_rounded),
+    );
+    expect(nextButton.style?.backgroundColor?.resolve({}), testDeck.accentColor);
+
+    // Advance to Card 2 so previous button is enabled
+    await tester.tap(find.widgetWithIcon(IconButton, Icons.arrow_forward_rounded));
+    await tester.pumpAndSettle();
+
+    final prevButton = tester.widget<IconButton>(
+      find.widgetWithIcon(IconButton, Icons.arrow_back_rounded),
+    );
+    expect(prevButton.style?.backgroundColor?.resolve({}), testDeck.accentColor);
+  });
 }

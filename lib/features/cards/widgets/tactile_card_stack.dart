@@ -385,11 +385,13 @@ class _TactileCardStackState extends State<TactileCardStack>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               // Previous Card Button
-              IconButton.filledTonal(
+              IconButton.filled(
                 tooltip: 'Previous question',
                 onPressed: _currentIndex > 0 ? _prevCard : null,
                 icon: const Icon(Icons.arrow_back_rounded, size: 22),
                 style: IconButton.styleFrom(
+                  backgroundColor: widget.accentColor,
+                  foregroundColor: Colors.white,
                   padding: const EdgeInsets.all(14),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
