@@ -1,9 +1,9 @@
 {
   "id": "getting_to_know_you",
-  "version": 1,
+  "version": 3,
   "title": "Getting to Know You",
   "description": "Engaging icebreakers and everyday stories for new acquaintances.",
-  "icon": "sparkles",
+  "icon": "wave",
   "accentColor": "#D97736",
   "questions": [
     "What place on earth feels most like home to you, and what makes it feel that way?",

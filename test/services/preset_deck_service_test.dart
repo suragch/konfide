@@ -38,7 +38,8 @@ void main() {
       expect(deck.questions[1].text, 'Second question?');
     });
 
-    test('parses preset JSON with structured question objects and custom IDs', () {
+    test('parses preset JSON with structured question objects and custom IDs',
+        () {
       const jsonStr = '''
       {
         "id": "structured_preset",
@@ -61,19 +62,22 @@ void main() {
       expect(deck.questions[1].text, 'Structured question 2?');
     });
 
-    test('loads all 6 bundled preset decks from assets/decks', () async {
+    test('loads all 7 bundled preset decks from assets/decks', () async {
       final decks = await PresetDeckService.loadAllPresetDecks();
 
-      expect(decks.length, 6);
+      expect(decks.length, 7);
       final ids = decks.map((d) => d.id).toSet();
-      expect(ids, containsAll([
-        'getting_to_know_you',
-        'friends_and_family',
-        'couples_romance',
-        'family_generations',
-        'thought_provoking',
-        'deeply_personal',
-      ]));
+      expect(
+          ids,
+          containsAll([
+            'getting_to_know_you',
+            'friends',
+            'couples_romance',
+            'family_generations',
+            'thought_provoking',
+            'deeply_personal',
+            'christian_faith',
+          ]));
 
       for (final deck in decks) {
         expect(deck.version, greaterThanOrEqualTo(1));
@@ -84,8 +88,10 @@ void main() {
     });
 
     test('throws FormatException for invalid preset JSON', () {
-      expect(() => PresetDeckService.parsePresetDeckJson(''), throwsA(isA<FormatException>()));
-      expect(() => PresetDeckService.parsePresetDeckJson('["not an object"]'), throwsA(isA<FormatException>()));
+      expect(() => PresetDeckService.parsePresetDeckJson(''),
+          throwsA(isA<FormatException>()));
+      expect(() => PresetDeckService.parsePresetDeckJson('["not an object"]'),
+          throwsA(isA<FormatException>()));
     });
   });
 }

@@ -280,7 +280,7 @@ class _TopicScreenState extends State<TopicScreen> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
-                            Icons.auto_awesome,
+                            Icons.bolt_rounded,
                             size: 16,
                             color: theme.colorScheme.primary,
                           ),

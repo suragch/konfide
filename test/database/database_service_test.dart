@@ -74,9 +74,9 @@ void main() {
       expect(afterDelete, isNull);
     });
 
-    test('seeds 6 default preset decks on creation', () async {
+    test('seeds 7 default preset decks on creation', () async {
       final presetDecks = await dbService.getDecks(isPreset: true);
-      expect(presetDecks.length, 6);
+      expect(presetDecks.length, 7);
       expect(presetDecks.first.id, 'getting_to_know_you');
     });
 

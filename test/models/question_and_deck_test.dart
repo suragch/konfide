@@ -25,9 +25,9 @@ void main() {
     });
 
 
-    test('Curated decks loaded from assets has 6 rich packs with > 300 questions total', () async {
+    test('Curated decks loaded from assets has 7 rich packs with > 300 questions total', () async {
       final decks = await PresetDeckService.loadAllPresetDecks();
-      expect(decks.length, 6);
+      expect(decks.length, 7);
 
       int totalQuestions = 0;
       for (final deck in decks) {

@@ -173,7 +173,7 @@ void main() {
 
     test('preset decks are loaded and can be duplicated', () async {
       final presetDecks = storage.getPresetDecks();
-      expect(presetDecks.length, 6);
+      expect(presetDecks.length, 7);
       expect(presetDecks.first.id, 'getting_to_know_you');
 
       // Duplicate preset deck into custom pack
@@ -227,11 +227,11 @@ void main() {
 
     test('deleteDeck permanently removes preset deck', () async {
       final initialPresets = storage.getPresetDecks();
-      expect(initialPresets.length, 6);
+      expect(initialPresets.length, 7);
       expect(initialPresets.any((d) => d.id == 'getting_to_know_you'), isTrue);
 
       await storage.deleteDeck('getting_to_know_you');
-      expect(storage.getPresetDecks().length, 5);
+      expect(storage.getPresetDecks().length, 6);
       expect(storage.getPresetDecks().any((d) => d.id == 'getting_to_know_you'), isFalse);
     });
 

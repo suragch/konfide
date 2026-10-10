@@ -9,21 +9,23 @@ class PresetDeckService {
   /// List of bundled preset deck asset file paths.
   static const List<String> presetAssetFiles = [
     'assets/decks/getting_to_know_you.json',
-    'assets/decks/friends_and_family.json',
+    'assets/decks/friends.json',
     'assets/decks/couples_romance.json',
     'assets/decks/family_generations.json',
     'assets/decks/thought_provoking.json',
     'assets/decks/deeply_personal.json',
+    'assets/decks/christian_faith.json',
   ];
 
   /// Canonical IDs of the preset decks in order.
   static const List<String> presetDeckIds = [
     'getting_to_know_you',
-    'friends_and_family',
+    'friends',
     'couples_romance',
     'family_generations',
     'thought_provoking',
     'deeply_personal',
+    'christian_faith',
   ];
 
   /// Compares two preset decks by their canonical asset ordering.
@@ -37,7 +39,8 @@ class PresetDeckService {
   }
 
   /// Parses a preset deck JSON string into a [QuestionDeck].
-  static QuestionDeck parsePresetDeckJson(String jsonString, {String? defaultId}) {
+  static QuestionDeck parsePresetDeckJson(String jsonString,
+      {String? defaultId}) {
     if (jsonString.trim().isEmpty) {
       throw const FormatException('Preset deck JSON is empty');
     }
@@ -47,10 +50,13 @@ class PresetDeckService {
       throw const FormatException('Root of preset deck JSON must be an object');
     }
 
-    final id = decoded['id'] as String? ?? defaultId ?? 'preset_${DateTime.now().millisecondsSinceEpoch}';
+    final id = decoded['id'] as String? ??
+        defaultId ??
+        'preset_${DateTime.now().millisecondsSinceEpoch}';
     final title = (decoded['title'] as String?)?.trim() ?? 'Curated Deck';
     final description = (decoded['description'] as String?)?.trim() ?? '';
-    final iconKey = decoded['icon'] as String? ?? decoded['iconKey'] as String? ?? 'chat';
+    final iconKey =
+        decoded['icon'] as String? ?? decoded['iconKey'] as String? ?? 'chat';
     final version = (decoded['version'] as num?)?.toInt() ?? 1;
 
     // Parse accent color (hex string or int ARGB value)
@@ -58,7 +64,8 @@ class PresetDeckService {
     final rawColor = decoded['accentColor'] ?? decoded['accentColorValue'];
     if (rawColor is String) {
       final hex = rawColor.replaceFirst('#', '').trim();
-      accentColor = Color(int.parse(hex.length == 6 ? 'FF$hex' : hex, radix: 16));
+      accentColor =
+          Color(int.parse(hex.length == 6 ? 'FF$hex' : hex, radix: 16));
     } else if (rawColor is num) {
       accentColor = Color(rawColor.toInt());
     }
@@ -74,7 +81,9 @@ class PresetDeckService {
       if (item is String) {
         text = item.trim();
       } else if (item is Map) {
-        text = (item['text'] ?? item['question'] ?? item['q'] ?? '').toString().trim();
+        text = (item['text'] ?? item['question'] ?? item['q'] ?? '')
+            .toString()
+            .trim();
         if (item['id'] != null) {
           questionId = item['id'].toString().trim();
         }
@@ -106,7 +115,8 @@ class PresetDeckService {
 
   /// Loads all preset decks configured in [presetAssetFiles].
   /// Uses [bundle] if provided, defaulting to [rootBundle].
-  static Future<List<QuestionDeck>> loadAllPresetDecks({AssetBundle? bundle}) async {
+  static Future<List<QuestionDeck>> loadAllPresetDecks(
+      {AssetBundle? bundle}) async {
     final effectiveBundle = bundle ?? rootBundle;
     final List<QuestionDeck> decks = [];
 
@@ -124,7 +134,8 @@ class PresetDeckService {
   }
 
   /// Loads a single preset deck by its ID from preset assets.
-  static Future<QuestionDeck?> loadPresetDeckById(String deckId, {AssetBundle? bundle}) async {
+  static Future<QuestionDeck?> loadPresetDeckById(String deckId,
+      {AssetBundle? bundle}) async {
     final decks = await loadAllPresetDecks(bundle: bundle);
     for (final d in decks) {
       if (d.id == deckId) return d;

@@ -14,11 +14,12 @@ konfide/
 ├── assets/
 │   └── decks/
 │       ├── getting_to_know_you.json
-│       ├── friends_and_family.json
+│       ├── friends.json
 │       ├── couples_romance.json
 │       ├── family_generations.json
 │       ├── thought_provoking.json
-│       └── deeply_personal.json
+│       ├── deeply_personal.json
+│       └── christian_faith.json
 ```
 
 ---
@@ -84,7 +85,7 @@ Open [`lib/core/services/preset_deck_service.dart`](file:///Users/suragch/Dev/Fl
 ```dart
 static const List<String> presetAssetFiles = [
   'assets/decks/getting_to_know_you.json',
-  'assets/decks/friends_and_family.json',
+  'assets/decks/friends.json',
   'assets/decks/couples_romance.json',
   'assets/decks/family_generations.json',
   'assets/decks/thought_provoking.json',
@@ -118,17 +119,19 @@ When users update or launch the app, Konfide automatically detects the new deck 
 ### Supported Icon Keys
 Use any of the following icon keywords in the `"icon"` field:
 
-| Icon Key      | Rendered Icon                 | Common Use Case                            |
-| :------------ | :---------------------------- | :----------------------------------------- |
-| `"sparkles"`  | `Icons.auto_awesome`          | Icebreakers, curiosity, creative questions |
-| `"people"`    | `Icons.people_outline`        | Friends, camaraderie, social memories      |
-| `"heart"`     | `Icons.favorite_outline`      | Couples, romance, vulnerability            |
-| `"home"`      | `Icons.home_outlined`         | Family, heritage, childhood roots          |
-| `"mind"`      | `Icons.psychology_outlined`   | Philosophy, deep thoughts, mind-benders    |
-| `"fire"`      | `Icons.local_fire_department` | Honest reflections, real talk, courage     |
-| `"lightbulb"` | `Icons.lightbulb_outline`     | Ideas, career, innovation, problem-solving |
-| `"explore"`   | `Icons.explore_outlined`      | Travel, adventure, life journeys           |
-| `"chat"`      | `Icons.chat_bubble_outline`   | General discussion (fallback default)      |
+| Icon Key      | Rendered Icon                            | Common Use Case                            |
+| :------------ | :--------------------------------------- | :----------------------------------------- |
+| `"wave"`      | `Icons.waving_hand_outlined`             | Icebreakers, introductions, greetings      |
+| `"handshake"` | `Icons.handshake_outlined`               | Meeting people, partnerships               |
+| `"people"`    | `Icons.people_outline`                   | Friends, camaraderie, social memories      |
+| `"heart"`     | `Icons.favorite_outline`                 | Couples, romance, vulnerability            |
+| `"home"`      | `Icons.home_outlined`                    | Family, heritage, childhood roots          |
+| `"mind"`      | `Icons.psychology_outlined`              | Philosophy, deep thoughts, mind-benders    |
+| `"fire"`      | `Icons.local_fire_department`            | Honest reflections, real talk, courage     |
+| `"lightbulb"` | `Icons.lightbulb_outline`                | Ideas, career, innovation, problem-solving |
+| `"explore"`   | `Icons.explore_outlined`                 | Travel, adventure, life journeys           |
+| `"cross"`     | `Icons.settings_accessibility_outlined`  | Christian faith, spirituality              |
+| `"chat"`      | `Icons.chat_bubble_outline`              | General discussion (fallback default)      |
 
 ### Question Formats: Simple vs. Structured
 You can format the `"questions"` array in two ways:

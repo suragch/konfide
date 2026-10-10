@@ -55,9 +55,15 @@ class QuestionDeck {
     if (icon == Icons.home || icon == Icons.home_outlined) return 'home';
     if (icon == Icons.lightbulb || icon == Icons.lightbulb_outline) return 'lightbulb';
     if (icon == Icons.psychology || icon == Icons.psychology_outlined) return 'mind';
+    if (icon == Icons.waving_hand || icon == Icons.waving_hand_outlined) return 'wave';
+    if (icon == Icons.handshake || icon == Icons.handshake_outlined) return 'handshake';
     if (icon == Icons.auto_awesome) return 'sparkles';
     if (icon == Icons.local_fire_department) return 'fire';
-    if (icon == Icons.explore) return 'explore';
+    if (icon == Icons.explore || icon == Icons.explore_outlined) return 'explore';
+    if (icon == Icons.settings_accessibility ||
+        icon == Icons.settings_accessibility_outlined) {
+      return 'cross';
+    }
     return 'chat';
   }
 
@@ -73,12 +79,20 @@ class QuestionDeck {
         return Icons.lightbulb_outline;
       case 'mind':
         return Icons.psychology_outlined;
+      case 'wave':
+        return Icons.waving_hand_outlined;
+      case 'handshake':
+        return Icons.handshake_outlined;
       case 'sparkles':
         return Icons.auto_awesome;
       case 'fire':
         return Icons.local_fire_department;
       case 'explore':
         return Icons.explore_outlined;
+      case 'cross':
+      case 'church':
+      case 'settings_accessibility':
+        return Icons.settings_accessibility_outlined;
       default:
         return Icons.chat_bubble_outline;
     }
