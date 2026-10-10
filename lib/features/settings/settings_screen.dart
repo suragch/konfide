@@ -132,7 +132,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                        color:
+                            theme.colorScheme.primary.withValues(alpha: 0.12),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
@@ -159,14 +160,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                       child: const Text(
                         'v1.1.0',
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontSize: 12, fontWeight: FontWeight.bold),
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 14),
                 Text(
-                  'Konfide is deliberately designed to be the antidote to screen addiction. No endless feeds, no ads, no algorithms, and 100% offline.\n\nIts sole purpose is to spark genuine, heartwarming, eye-to-eye conversations with the people right beside you.',
+                  'Konfide is designed foster meaningful conversations with the people right next to you.',
                   style: theme.textTheme.bodyMedium?.copyWith(height: 1.5),
                 ),
               ],

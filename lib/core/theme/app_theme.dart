@@ -4,7 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 enum AppThemePreset {
   candlelight,
   midnight,
-  terracotta,
   sage;
 
   String get displayName {
@@ -13,8 +12,6 @@ enum AppThemePreset {
         return 'Candlelight Warmth';
       case AppThemePreset.midnight:
         return 'Midnight Obsidian';
-      case AppThemePreset.terracotta:
-        return 'Terracotta & Linen';
       case AppThemePreset.sage:
         return 'Eucalyptus Sage';
     }
@@ -71,17 +68,6 @@ class AppPalette {
     brightness: Brightness.dark,
   );
 
-  static const terracotta = AppPalette(
-    background: Color(0xFFF4ECE6),
-    surface: Color(0xFFEADFD7),
-    cardBackground: Color(0xFFFFFDFB),
-    primary: Color(0xFFA84323),
-    textPrimary: Color(0xFF2A1C16),
-    textSecondary: Color(0xFF6E564D),
-    border: Color(0xFFDECFCE),
-    brightness: Brightness.light,
-  );
-
   static const sage = AppPalette(
     background: Color(0xFFEBF1ED),
     surface: Color(0xFFDEE8E1),
@@ -99,8 +85,6 @@ class AppPalette {
         return candlelight;
       case AppThemePreset.midnight:
         return midnight;
-      case AppThemePreset.terracotta:
-        return terracotta;
       case AppThemePreset.sage:
         return sage;
     }
