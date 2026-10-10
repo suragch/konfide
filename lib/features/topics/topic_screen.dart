@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:konfide/core/models/companion.dart';
@@ -19,6 +21,36 @@ class TopicScreen extends StatefulWidget {
   final ValueChanged<AppThemePreset> onThemeChanged;
 
   const TopicScreen({super.key, required this.onThemeChanged});
+
+  static Question computeDailySpark(
+    List<Question> allQuestions, {
+    DateTime? date,
+  }) {
+    if (allQuestions.isEmpty) {
+      return const Question(
+        id: 'spark_default',
+        text:
+            'What is something simple in your life right now that you feel deeply grateful for?',
+        deckId: 'getting_to_know_you',
+      );
+    }
+
+    final now = date ?? DateTime.now();
+    final todaySeed = now.year * 10000 + now.month * 100 + now.day;
+    var index = Random(todaySeed).nextInt(allQuestions.length);
+
+    if (allQuestions.length > 1) {
+      final yesterday = now.subtract(const Duration(days: 1));
+      final yesterdaySeed =
+          yesterday.year * 10000 + yesterday.month * 100 + yesterday.day;
+      final yesterdayIndex = Random(yesterdaySeed).nextInt(allQuestions.length);
+      if (index == yesterdayIndex) {
+        index = (index + 1) % allQuestions.length;
+      }
+    }
+
+    return allQuestions[index];
+  }
 
   @override
   State<TopicScreen> createState() => _TopicScreenState();
@@ -42,22 +74,16 @@ class _TopicScreenState extends State<TopicScreen> {
   }
 
   void _onStorageUpdate() {
-    if (mounted) setState(() {});
+    if (mounted) {
+      _pickDailySpark();
+      setState(() {});
+    }
   }
 
   void _pickDailySpark() {
-    final now = DateTime.now();
-    final dayOfYear = now.year * 365 + now.month * 31 + now.day;
-    final allQuestions = _storage.getAllDecks().expand((d) => d.questions).toList();
-    if (allQuestions.isNotEmpty) {
-      _dailySpark = allQuestions[dayOfYear % allQuestions.length];
-    } else {
-      _dailySpark = const Question(
-        id: 'spark_default',
-        text: 'What is something simple in your life right now that you feel deeply grateful for?',
-        deckId: 'getting_to_know_you',
-      );
-    }
+    final allQuestions =
+        _storage.getAllDecks().expand((d) => d.questions).toList();
+    _dailySpark = TopicScreen.computeDailySpark(allQuestions);
   }
 
   void _confirmDeleteDeck(QuestionDeck deck) {

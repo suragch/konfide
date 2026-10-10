@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:konfide/core/models/question.dart';
 import 'package:konfide/core/services/storage_service.dart';
 import 'package:konfide/core/theme/app_theme.dart';
 import 'package:konfide/features/topics/topic_screen.dart';
@@ -208,4 +209,63 @@ void main() {
     expect(find.text('Deleted "$firstPresetTitle" pack'), findsOneWidget);
     expect(find.text('Undo'), findsNothing);
   });
+
+  group('Daily Spark selection', () {
+    final sampleQuestions = List.generate(
+      100,
+      (i) => Question(
+        id: 'q_$i',
+        text: 'Question $i',
+        deckId: 'deck_1',
+      ),
+    );
+
+    test('returns consistent question on the same day', () {
+      final date = DateTime(2026, 10, 10, 8, 30);
+      final laterDate = DateTime(2026, 10, 10, 23, 45);
+
+      final q1 = TopicScreen.computeDailySpark(sampleQuestions, date: date);
+      final q2 = TopicScreen.computeDailySpark(sampleQuestions, date: laterDate);
+
+      expect(q1.id, equals(q2.id));
+    });
+
+    test('picks pseudo-random questions across days rather than sequential', () {
+      final day1 = DateTime(2026, 10, 1);
+      final day2 = DateTime(2026, 10, 2);
+      final day3 = DateTime(2026, 10, 3);
+
+      final q1 = TopicScreen.computeDailySpark(sampleQuestions, date: day1);
+      final q2 = TopicScreen.computeDailySpark(sampleQuestions, date: day2);
+      final q3 = TopicScreen.computeDailySpark(sampleQuestions, date: day3);
+
+      final idx1 = int.parse(q1.id.replaceFirst('q_', ''));
+      final idx2 = int.parse(q2.id.replaceFirst('q_', ''));
+      final idx3 = int.parse(q3.id.replaceFirst('q_', ''));
+
+      // Indices should not simply be idx1 + 1 and idx2 + 1
+      expect(idx2 == idx1 + 1 && idx3 == idx2 + 1, isFalse);
+    });
+
+    test('avoids consecutive repeats when multiple questions are available', () {
+      DateTime current = DateTime(2026, 1, 1);
+      String? previousId;
+
+      for (int i = 0; i < 365; i++) {
+        final spark = TopicScreen.computeDailySpark(sampleQuestions, date: current);
+        if (previousId != null) {
+          expect(spark.id, isNot(equals(previousId)));
+        }
+        previousId = spark.id;
+        current = current.add(const Duration(days: 1));
+      }
+    });
+
+    test('falls back to default question when question list is empty', () {
+      final fallback = TopicScreen.computeDailySpark([]);
+      expect(fallback.id, equals('spark_default'));
+      expect(fallback.text, contains('deeply grateful'));
+    });
+  });
 }
+
