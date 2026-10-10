@@ -53,7 +53,13 @@ class _CardShareDialogState extends State<CardShareDialog> {
 
       final pngBytes = byteData.buffer.asUint8List();
       final tempDir = await getTemporaryDirectory();
+      if (!await tempDir.exists()) {
+        await tempDir.create(recursive: true);
+      }
       final file = File('${tempDir.path}/konfide_card_${DateTime.now().millisecondsSinceEpoch}.png');
+      if (!await file.parent.exists()) {
+        await file.parent.create(recursive: true);
+      }
       await file.writeAsBytes(pngBytes);
 
       if (mounted) {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:konfide/core/services/haptic_service.dart';
 import 'package:konfide/core/services/storage_service.dart';
 import 'package:konfide/core/theme/app_theme.dart';
@@ -15,6 +16,26 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   final StorageService _storage = StorageService.instance;
+  String _version = 'v2.0.0';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAppVersion();
+  }
+
+  Future<void> _loadAppVersion() async {
+    try {
+      final info = await PackageInfo.fromPlatform();
+      if (mounted) {
+        setState(() {
+          _version = 'v${info.version}';
+        });
+      }
+    } catch (_) {
+      // In tests or if platform channels fail, keep default
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -158,9 +179,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         color: theme.dividerColor.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: const Text(
-                        'v1.1.0',
-                        style: TextStyle(
+                      child: Text(
+                        _version,
+                        style: const TextStyle(
                             fontSize: 12, fontWeight: FontWeight.bold),
                       ),
                     ),

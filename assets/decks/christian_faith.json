@@ -1,10 +1,10 @@
 {
     "id": "christian_faith",
-    "version": 2,
+    "version": 3,
     "title": "Christian Faith",
     "description": "Belief in God, following Jesus, and a life of full commitment.",
     "icon": "cross",
-    "accentColor": "#DC2626",
+    "accentColor": "#0D9488",
     "questions": [
         "Is God real? Are you 100% certain? How do you know?",
         "To the skeptic: If you encountered undeniable evidence that Jesus Christ rose bodily from the grave, would you actually submit your life to Him, or would you still resist His authority?",

@@ -135,6 +135,9 @@ class DeckExchangeService {
   ) async {
     final json = exportDeckToJson(deck);
     final tempDir = await getTemporaryDirectory();
+    if (!await tempDir.exists()) {
+      await tempDir.create(recursive: true);
+    }
 
     final safeTitle = deck.title
         .replaceAll(RegExp(r'[^\w\s-]'), '')
@@ -143,6 +146,9 @@ class DeckExchangeService {
         .toLowerCase();
     final filename = '${safeTitle.isEmpty ? "pack" : safeTitle}.json';
     final file = File(p.join(tempDir.path, filename));
+    if (!await file.parent.exists()) {
+      await file.parent.create(recursive: true);
+    }
     await file.writeAsString(json);
 
     if (!context.mounted) return;

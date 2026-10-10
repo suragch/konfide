@@ -23,6 +23,7 @@ dependencies:
   sqflite_common_ffi: ^2.4.3
   sqflite_common: ^2.5.13
   file_picker: ^13.1.0
+  package_info_plus: ^10.2.2
 
 dev_dependencies:
   flutter_test:
